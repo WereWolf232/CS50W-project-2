@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+<ul>
+    {% for Listing in listings %}
+    {% if Listing.ongoing == True %}
+    <li><div><a href="{% url 'listing' Listing.id %}"><strong>{{Listing.item}}</strong></a></div>
+        <div>- {{Listing.description}}</div>
+        <div>
+        <br>
+        {% if Listing.current_bid == null %}
+        Starting Price: {{Listing.starting_price}}$
+        {% else %}
+        Current Bid: {{Listing.current_bid.amount}}$
+        {% endif %}
+        </div>
+        {% if Listing.image %}
+        <div><img src="{{Listing.image}}" alt="{{Listing.item}}" width="250" height="150"></div>
+        {% endif%}
+        
+    </li><hr>
+    {% endif %}
+    {% endfor %}
+</ul>
+    
+{% endblock %}

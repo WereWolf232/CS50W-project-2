@@ -1,0 +1,98 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block body %}
+    {% if Listing.ongoing == False %}
+    <h1>Auction Ended</h1>
+    {% endif %}
+    {% if user.username == Listing.current_bid.bidder.username and Listing.ongoing == False %}
+        <!-- if auction over, page should say user won -->
+        <h1>You Won!</h1>
+        {% endif %}
+        <div><u><strong>{{Listing.item}}</strong></u></div>
+        <div>- {{Listing.description}}</div><hr>
+        <div>
+        {% if Listing.current_bid == null %}
+        Starting Price: {{Listing.starting_price}} $
+        {% else %}
+        {% if Listing.ongoing == True %}
+        Current Bid: {{Listing.current_bid.amount}} $
+        {% else %}
+        Sold For: {{Listing.current_bid.amount}} $
+        {% endif %}
+        {% endif %}
+        </div>
+        {% if Listing.image %}
+        <div><img src="{{Listing.image}}" alt="{{Listing.item}}" width="500" height="300"></div>
+        {% endif%}
+        
+        <br>
+        
+        {% if user.is_authenticated %}
+
+            
+
+            <!-- if auction closed then don't allow most actions-->
+            {% if Listing.ongoing == True %}
+
+                {% if user.username != Listing.poster.username %}
+
+                
+                    <!-- bid on the item. The bid must be at least as large as the starting bid,
+                    and must be greater than any other bids that have been placed (if any). 
+                    If the bid doesn’t meet those criteria, the user should be presented with an error. -->
+                    <form action="{% url 'listing' Listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ bid_form }}
+                        <div><input type="submit" value="Place Bid"></div></form>
+
+                    <br>
+                    
+
+                    <!-- add and remove from watchlist -->
+                    <form action="{% url 'watchlist' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing_id" value="{{ Listing.id }}">
+
+                        {% if Listing in watchlist %}
+                        <div><input type="submit" name="mod_watchlist" value="Remove From Watchlist"></div></form>
+                        {% else%}
+                        <div><input type="submit" name ="mod_watchlist" value="Add To Watchlist"></div></form>
+                        {% endif %}
+            
+                    {% endif %}
+
+
+                    {% if user.username == Listing.poster.username %}
+                    <!-- the user should have the ability to “close” the auction from this page, 
+                        which makes the highest bidder the winner of the auction and makes the listing no longer active.-->
+                    <form action="{% url 'close_auction' Listing.id %}" method="POST">
+                        {% csrf_token %}
+                        <div><input type="submit" value="End Auction"></div></form>
+                
+                    {% endif %}
+                    <hr>
+                    <!-- Users who are signed in should be able to add comments to the listing page -->
+                    <h4>Post Comment</h4>
+                    <form action="{% url 'comment' Listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ comment_form.content }}
+                        <div><input type="submit" value="Post Comment"></div></form>
+
+            {% endif %}
+        {% endif %}
+
+        <p></p>
+        <h3>Comments</h3>
+        <ul>
+            {% for comment in comments %}
+            <li> {{comment.author}}<div>- {{ comment.content }}</div></li>
+            {% empty %}
+            Be the first one to comment!
+        </ul>
+        {% endfor %}
+
+
+
+
+{% endblock %}

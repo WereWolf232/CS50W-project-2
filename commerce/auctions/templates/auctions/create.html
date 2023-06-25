@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+   <form action="{% url 'create' %}" method="POST">
+   {% csrf_token %}
+   <div>{{form.item.label_tag}}
+   {{form.item}}</div>
+   <div>{{form.category.label_tag}}
+   {{form.category}}</div>
+   <div>{{form.description.label_tag}}</div>
+   <div>{{form.description}}</div>
+   <div>{{form.starting_bid.label_tag}}
+   {{form.starting_bid}}</div>
+   <div>{{form.image.label_tag}}
+   {{form.image}}</div>
+   <div><input type="submit"></div></form>
+{% endblock %}
